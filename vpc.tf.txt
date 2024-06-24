@@ -1,0 +1,77 @@
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "aws-1"
+  }
+}
+
+resource "aws_vpc" "vpc-1" {
+  cidr_block = "10.2.0.0/16"
+  tags = {
+    Name = "aws-2"
+  }
+}
+
+resource "aws_subnet" "subnet-public" {
+  vpc_id            = "vpc-011f93f42a36fea51"
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+
+  tags = {
+    Name = "Publicsubnet-1"
+  }
+}
+
+resource "aws_subnet" "subnet-private" {
+  vpc_id            = "vpc-011f93f42a36fea51"
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1a"
+
+  tags = {
+    Name = "privatesubnet-1"
+  }
+}
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = "vpc-011f93f42a36fea51"
+
+  tags = {
+    Name = "igw-2"
+  }
+}
+
+resource "aws_route_table" "rt3" {
+  vpc_id = "vpc-011f93f42a36fea51"
+  tags = {
+    Name = "rt3"
+  }
+  # since this is exactly the route AWS will create, the route will be adopted
+  route {
+    cidr_block = "10.0.0.0/16"
+    gateway_id = "local"
+  }
+}
+
+resource "aws_security_group" "allow_tls" {
+  name   = "allow"
+  vpc_id = "vpc-011f93f42a36fea51"
+  ingress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  tags = {
+    Name = "sg-2"
+  }
+}
+
